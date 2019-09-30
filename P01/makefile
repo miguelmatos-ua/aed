@@ -8,6 +8,7 @@ clean:
 	rm -f table
 	rm -f sizes sizes_32 sizes_64
 	rm -f fibonacci fibonacci_m
+	rm -f command_line_arguments
 	rm -f factor solution_factor
 	rm -f rational_approximation solution_rational_approximation solution_rational_approximation_p solution_rational_approximation_n
 
@@ -57,6 +58,11 @@ fibonacci:		fibonacci.c elapsed_time.h
 
 fibonacci_m:		fibonacci_with_a_macro.c elapsed_time.h
 	cc -Wall -O2 fibonacci_with_a_macro.c -o fibonacci_m -lm
+
+
+
+command_line_arguments:	command_line_arguments.c
+	cc -Wall -O2 command_line_arguments.c -o command_line_arguments
 
 
 
