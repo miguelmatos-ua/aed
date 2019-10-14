@@ -36,4 +36,7 @@ void g3(int n,int *a)
 int main(void)
 {
   // place your code here
+  printf("g1: %d\n", g1(10));
+  for (int i = 1; i <=10; i++)
+    printf("g2 -> %d: %d\n", i, g2(i));
 }

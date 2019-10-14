@@ -68,4 +68,10 @@ int f6(int n)
 int main(void)
 {
   // place your code here
+  printf("f1: %d\n",f1(10));
+  printf("f2: %d\n",f2(10));
+  printf("f3: %d\n",f3(10));
+  printf("f4: %d\n",f4(10));
+  printf("f5: %d\n",f5(10));
+  printf("f6: %d\n",f6(10));
 }
