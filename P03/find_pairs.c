@@ -79,122 +79,112 @@
 #include <stdlib.h>
 #include "../P01/elapsed_time.h"
 
-static long long counter1,counter2,counter3;
+static long long counter1, counter2, counter3;
 
-void find_pairs_v1(int *a,int n,int v)
-{ // arbitrary input, try all distinct pairs
-  int i,j;
+void find_pairs_v1(int *a, int n, int v) { // arbitrary input, try all distinct pairs
+    int i, j;
 
-  fprintf(stderr,"find_pairs_v1 output:\n");
-  for(i = 0;i < n;i++)
-    for(j = i + 1;j < n;j++)
-    {
-      counter1++;
-      if(a[i] + a[j] == v)
-        fprintf(stderr,"  %d %d\n",a[(a[i] <= a[j]) ? i : j],a[(a[i] <= a[j]) ? j : i]);
+    fprintf(stderr, "find_pairs_v1 output:\n");
+    for (i = 0; i < n; i++)
+        for (j = i + 1; j < n; j++) {
+            counter1++;
+            if (a[i] + a[j] == v)
+                fprintf(stderr, "  %d %d\n", a[(a[i] <= a[j]) ? i : j], a[(a[i] <= a[j]) ? j : i]);
+        }
+}
+
+void find_pairs_v2(int *a, int n, int v) { // positive input, use a lot of memory to speed things up
+    char *pc;
+    int i;
+
+    if (v < 0)
+        return;
+    fprintf(stderr, "find_pairs_v2 output:\n");
+    pc = (char *) calloc((size_t)(v + 1), sizeof(char));
+    for (i = 0; i < n; i++) {
+        counter2++;
+        if (a[i] >= 0 && a[i] <= v)
+            pc[a[i]] = 1;
+    }
+    for (i = 0; i < n; i++) {
+        counter2++;
+        if (a[i] >= 0 && 2 * a[i] < v && pc[v - a[i]] != 0)
+            fprintf(stderr, "  %d %d\n", a[i], v - a[i]);
+    }
+    free(pc);
+}
+
+int int_cmp(const void *p1, const void *p2) {
+    if (*(int *) p1 < *(int *) p2)
+        return -1;
+    if (*(int *) p1 > *(int *) p2)
+        return +1;
+    return 0;
+}
+
+void find_pairs_v3(int *a, int n, int v) { // arbitrary input, sort input (call it last!)
+    int i, j;
+
+    fprintf(stderr, "find_pairs_v3 output:\n");
+    qsort(a, n, sizeof(int), int_cmp); // sort a[]; the last argument is a pointer to a function!
+    for (i = 0, j = n - 1; j > i; i++) {
+        while (j > i && a[i] + a[j] > v) {
+            counter3++;
+            j--;
+        }
+        if (j > i && a[i] + a[j] == v)
+            fprintf(stderr, "  %d %d\n", a[i], a[j]);
     }
 }
 
-void find_pairs_v2(int *a,int n,int v)
-{ // positive input, use a lot of memory to speed things up
-  char *pc;
-  int i;
+int main(int argc, char **argv) {
+    double dt1, dt2, dt3;
+    int i, j, n, *a;
+    long long v;
 
-  if(v < 0)
-    return;
-  fprintf(stderr,"find_pairs_v2 output:\n");
-  pc = (char *)calloc((size_t)(v + 1),sizeof(char));
-  for(i = 0;i < n;i++)
-  {
-    counter2++;
-    if(a[i] >= 0 && a[i] <= v)
-      pc[a[i]] = 1;
-  }
-  for(i = 0;i < n;i++)
-  {
-    counter2++;
-    if(a[i] >= 0 && 2 * a[i] < v && pc[v - a[i]] != 0)
-      fprintf(stderr,"  %d %d\n",a[i],v - a[i]);
-  }
-  free(pc);
-}
-
-int int_cmp(const void *p1,const void *p2)
-{
-  if(*(int *)p1 < *(int *)p2)
-    return -1;
-  if(*(int *)p1 > *(int *)p2)
-    return +1;
-  return 0;
-}
-
-void find_pairs_v3(int *a,int n,int v)
-{ // arbitrary input, sort input (call it last!)
-  int i,j;
-
-  fprintf(stderr,"find_pairs_v3 output:\n");
-  qsort(a,n,sizeof(int),int_cmp); // sort a[]; the last argument is a pointer to a function!
-  for(i = 0,j = n - 1;j > i;i++)
-  {
-    while(j > i && a[i] + a[j] > v)
-    {
-      counter3++;
-      j--;
-    }
-    if(j > i && a[i] + a[j] == v)
-      fprintf(stderr,"  %d %d\n",a[i],a[j]);
-  }
-}
-
-int main(int argc,char **argv)
-{
-  double dt1,dt2,dt3;
-  int i,j,n,*a;
-  long long v;
-
-  srand((unsigned int)time(NULL)); // "seed" the pseudo-random number generator
-  n = (argc < 2) ? 1000 : atoi(argv[1]);
-  if(n < 10 || n > 100000000)
-    return 1; // bad command line argument
-  //
-  // initialize a[] with pseudo-random values
-  //
-  a = (int *)malloc((size_t)n * sizeof(int));
-  if(a == NULL)
-    return 2; // memory allocation failed
-  for(i = 0;i < n;i++)
-    a[i] = random() & 0x1FFFFFFF;
-  //
-  // choose distinct random indices
-  //
-  i = random() % n;
-  do
-    j = random() % n;
-  while(j == i);
-  //
-  // choose desired sum
-  //
+    srand((unsigned int) time(NULL)); // "seed" the pseudo-random number generator
+    n = (argc < 2) ? 1000 : atoi(argv[1]);
+    if (n < 10 || n > 100000000)
+        return 1; // bad command line argument
+    //
+    // initialize a[] with pseudo-random values
+    //
+    a = (int *) malloc((size_t) n * sizeof(int));
+    if (a == NULL)
+        return 2; // memory allocation failed
+    for (i = 0; i < n; i++)
+        a[i] = random() & 0x1FFFFFFF;
+    //
+    // choose distinct random indices
+    //
+    i = random() % n;
+    do
+        j = random() % n;
+    while (j == i);
+    //
+    // choose desired sum
+    //
 #if 1
-  v = a[i] + a[j]; // "random" but known to exist
+    v = a[i] + a[j]; // "random" but known to exist
 #else
-  v = 0x0FFFFFFF;  // fixed (for benchmarking purposes, find_pairs_v2() uses 256MiB)
+    v = 0x0FFFFFFF;  // fixed (for benchmarking purposes, find_pairs_v2() uses 256MiB)
 #endif
-  //
-  // run algorithms
-  //
-  (void)elapsed_time();
-  if(n <= 1000000)
-    find_pairs_v1(a,n,v);
-  dt1 = elapsed_time();
-  find_pairs_v2(a,n,v);
-  dt2 = elapsed_time();
-  find_pairs_v3(a,n,v);
-  dt3 = elapsed_time();
-  printf("\n");
-  printf("        n     version 1  version 2  version 3\n");
-  printf("---------  ------------  ---------  ---------\n");
-  printf("%9d  %12lld  %9lld  %9lld\n",n,counter1,counter2,counter3);
-  printf("              %9.3e  %9.3e  %9.3e\n",dt1,dt2,dt3);
-  printf("---------  ------------  ---------  ---------\n");
-  return 0; // ok
+    //
+    // run algorithms
+    //
+    (void) elapsed_time();
+    if (n <= 1000000)
+        find_pairs_v1(a, n, v);
+    dt1 = elapsed_time();
+    find_pairs_v2(a, n, v);
+    dt2 = elapsed_time();
+    find_pairs_v3(a, n, v);
+    dt3 = elapsed_time();
+    printf("\n");
+    printf("        n     version 1  version 2  version 3\n");
+    printf("---------  ------------  ---------  ---------\n");
+    printf("%9d  %12lld  %9lld  %9lld\n", n, counter1, counter2, counter3);
+    printf("              %9.3e  %9.3e  %9.3e\n", dt1, dt2, dt3);
+    printf("---------  ------------  ---------  ---------\n");
+    return 0; // ok
 }
