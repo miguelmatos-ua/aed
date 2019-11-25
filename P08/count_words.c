@@ -43,19 +43,15 @@ static node *add_word(node *root, char *word) {
             if (n->left == NULL) {
                 n->left = new_node(word);
                 return root;
-            }
-            else n = n->left;
-        }
-        else if (c == 0) {
+            } else n = n->left;
+        } else if (c == 0) {
             n->count++;
             return root;
-        }
-        else {
+        } else {
             if (n->right == NULL) {
                 n->right = new_node(word);
                 return root;
-            }
-            else n = n->right;
+            } else n = n->right;
         }
     }
 }
@@ -81,10 +77,13 @@ static long count_different_words(node *n) {
 }
 
 static void list_words(node *n) {
+    if (n == NULL)
+        return;
     list_words(n->left);
     printf("%6ld %s\n", n->count, n->word);
     list_words(n->right);
 }
+
 
 //
 // Main program
@@ -97,14 +96,14 @@ int main(int argc, char **argv) {
     if (argc >= 3 && strcmp(argv[1], "-d") == 0) opt = 'd'; // different words
     if (argc >= 3 && strcmp(argv[1], "-l") == 0) opt = 'l'; // list words
     if (opt < 0) {
-//        fprintf(stderr, "\e[5;31m"); // blink on (may not work in some text terminals), text in red
+        fprintf(stderr, "\e[5;31m"); // blink on (may not work in some text terminals), text in red
         fprintf(stderr, "usage: %s -a text_file ...  # count the number of words\n", argv[0]);
         fprintf(stderr, "       %s -d text_file ...  # count the number of different words\n", argv[0]);
         fprintf(stderr, "       %s -l text_file ...  # list all words\n", argv[0]);
-//        fprintf(stderr, "\e[0m"); // normal output
+        fprintf(stderr, "\e[0m"); // normal output
         return 1;
     }
-    for (int i = 2; i <= argc; i++) {
+    for (int i = 2; i < argc; i++) {
         // read text file
         FILE *fp = fopen(argv[i], "r");
         if (fp == NULL) {
