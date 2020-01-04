@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "FileReader.c"
 
 //
 // Custom ordered binary tree implementation
@@ -83,7 +84,6 @@ static void list_words(node *n) {
     printf("%6ld %s\n", n->count, n->word);
     list_words(n->right);
 }
-
 
 //
 // Main program
